@@ -8,21 +8,21 @@
  *
  * You do not need to understand this file. Follow README.md to deploy it.
  */
- 
-export default async function handler(req, res) {
+
+module.exports = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "*");
   res.setHeader("Cache-Control", "public, max-age=60");
- 
+
   if (req.method === "OPTIONS") {
     res.status(200).end();
     return;
   }
- 
+
   const pathParam = req.query.path;
   const targetPath = Array.isArray(pathParam) ? pathParam.join("/") : (pathParam || "");
- 
+
   const queryString = new URLSearchParams();
   for (const [key, value] of Object.entries(req.query)) {
     if (key === "path") continue;
@@ -33,9 +33,9 @@ export default async function handler(req, res) {
     }
   }
   const search = queryString.toString();
- 
+
   const targetUrl = `https://site.api.espn.com/apis/site/v2/${targetPath}${search ? "?" + search : ""}`;
- 
+
   try {
     const upstreamResp = await fetch(targetUrl, {
       headers: {
@@ -53,5 +53,4 @@ export default async function handler(req, res) {
   } catch (err) {
     res.status(502).json({ error: "Upstream fetch failed", detail: String(err) });
   }
-}
- 
+};
